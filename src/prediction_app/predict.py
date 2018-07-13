@@ -1,11 +1,9 @@
-import os
 import base64
 import json
 import falcon
 import numpy as np
 from io import BytesIO
 from PIL import Image, ImageOps
-from keras.models import load_model
 
 
 def convert_image(image):
@@ -17,6 +15,10 @@ def convert_image(image):
 
 
 class GetResource(object):
+
+    def __init__(self, model):
+        self.model = model
+
     def on_get(self, req, resp):
         resp.status = falcon.HTTP_200
         resp.body = 'Hello World!'
@@ -27,10 +29,9 @@ class GetResource(object):
         curl -H "Content-Type: application/json" -d @-  http://0.0.0.0:8080/predict
         """
         image = json.loads(req.stream.read())
-        model = load_model(os.path.join(os.path.dirname(__file__), 'model/cnn_model.h5'))
         decoded_image = base64.b64decode(image.get('image'))
         data = convert_image(BytesIO(decoded_image))
-        predicted_data = model.predict_classes(data)[0]
+        predicted_data = self.model.predict_classes(data)[0]
 
         output = {'prediction': str(predicted_data)}
         resp.status = falcon.HTTP_200

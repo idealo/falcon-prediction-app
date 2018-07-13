@@ -1,13 +1,15 @@
 # Machine Learning Web API Example with Falcon
 
-Simple example to use [Falcon](https://falconframework.org/) to create a RESTful prediction service (simple convnet trained on the MNIST dataset).
+Simple example that uses [Falcon](https://falconframework.org/) to create a deep learning RESTful prediction service (simple convnet trained on the MNIST dataset). [Locust](https://locust.io/) is used for load testing.
+Gunicorn as WSGI HTTP Server and nginx as HTTP proxy server.
 
 ## Getting Started
 
 ### Run prediction service
 
 ```
-gunicorn -b 0.0.0.0:8080 --reload src.prediction_app.app
+docker build -t falcon-prediction-app .
+docker run -p 8080:8080 falcon-prediction-app
 ```
 
 ### Test prediction service
@@ -23,6 +25,13 @@ curl -i -H "Content-Type: application/json" -d @-  http://0.0.0.0:8080/predict
 pytest -s src/tests/
 ```
 
+### Run load testing
+
+```
+locust -f load_testing.py --host=http://0.0.0.0:8080
+```
+Note: Access the Locust GUI via `http://localhost:8089/` to start load testing.
+
 ## Dependencies
 - Python conda environment (install with `conda env create --file environment.yml`)
 - Gunicorn
@@ -30,6 +39,7 @@ pytest -s src/tests/
 - Keras
 - Tensorflow
 - Pillow
+- Locust
 
 ## Copyright
 See [LICENSE](LICENSE) for details.

@@ -14,6 +14,8 @@ RUN apk --update --repository http://dl-4.alpinelinux.org/alpine/edge/community 
     libxext \
     libxrender \
     tini \
+    nginx \
+    supervisor \
     && curl -L "https://github.com/andyshinn/alpine-pkg-glibc/releases/download/2.25-r0/glibc-2.25-r0.apk" -o /tmp/glibc.apk \
     && curl -L "https://github.com/andyshinn/alpine-pkg-glibc/releases/download/2.25-r0/glibc-bin-2.25-r0.apk" -o /tmp/glibc-bin.apk \
     && curl -L "https://github.com/andyshinn/alpine-pkg-glibc/releases/download/2.25-r0/glibc-i18n-2.25-r0.apk" -o /tmp/glibc-i18n.apk \
@@ -29,13 +31,16 @@ RUN echo 'export PATH=/opt/conda/bin:$PATH' > /etc/profile.d/conda.sh && \
 
 ENV PATH /opt/conda/bin:$PATH
 
+RUN mkdir -p /run/nginx
+
 COPY environment.yml /
 RUN conda env create -f=environment.yml -n myapp
 
-COPY src/ /app
+COPY src/ conf/ ./app/
 ENV PATH /opt/conda/envs/myapp/bin:$PATH
-WORKDIR /app
+WORKDIR ./app/
+
 
 EXPOSE 8080
 
-CMD ["gunicorn", "-w 1", "-b 0.0.0.0:8080", "prediction_app.app"]
+CMD ["supervisord", "-n", "-c", "supervisor.conf"]
