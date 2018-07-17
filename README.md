@@ -1,7 +1,7 @@
 # Machine Learning Web API Example with Falcon
 
 Simple example that uses [Falcon](https://falconframework.org/) to create a deep learning RESTful prediction service (simple convnet trained on the MNIST dataset). [Locust](https://locust.io/) is used for load testing.
-Gunicorn as WSGI HTTP Server and nginx as HTTP proxy server.
+[Gunicorn](http://gunicorn.org/) as WSGI HTTP Server and [nginx](https://www.nginx.com/) as HTTP proxy server.
 
 ## Getting Started
 
