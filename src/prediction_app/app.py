@@ -1,7 +1,7 @@
 import os
 import falcon
 from keras.models import load_model
-from .predict import GetResource
+from .predict import PredictResource
 
 api = application = falcon.API()
 
@@ -13,5 +13,5 @@ def load_trained_model():
     return model
 
 
-predict = GetResource(model=load_trained_model())
+predict = PredictResource(model=load_trained_model())
 api.add_route('/predict', predict)

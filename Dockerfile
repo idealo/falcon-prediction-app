@@ -1,4 +1,4 @@
-FROM alpine:3.8
+FROM nginx:stable-alpine
 LABEL maintainer="dat.tran@idealo.de"
 
 RUN apk --update --repository http://dl-4.alpinelinux.org/alpine/edge/community add \
@@ -14,7 +14,6 @@ RUN apk --update --repository http://dl-4.alpinelinux.org/alpine/edge/community 
     libxext \
     libxrender \
     tini \
-    nginx \
     supervisor \
     && curl -L "https://github.com/andyshinn/alpine-pkg-glibc/releases/download/2.25-r0/glibc-2.25-r0.apk" -o /tmp/glibc.apk \
     && curl -L "https://github.com/andyshinn/alpine-pkg-glibc/releases/download/2.25-r0/glibc-bin-2.25-r0.apk" -o /tmp/glibc-bin.apk \
@@ -31,16 +30,27 @@ RUN echo 'export PATH=/opt/conda/bin:$PATH' > /etc/profile.d/conda.sh && \
 
 ENV PATH /opt/conda/bin:$PATH
 
-RUN mkdir -p /run/nginx
+RUN mkdir /run/nginx/ \
+    && mv /etc/nginx/conf.d/default.conf /etc/nginx/conf.d/default.conf.bak
+
+ADD conf/nginx.conf /etc/nginx/conf.d/
+ADD conf/supervisor.ini /etc/supervisor.d/
 
 COPY environment.yml /
 RUN conda env create -f=environment.yml -n myapp
-
-COPY src/ conf/ ./app/
 ENV PATH /opt/conda/envs/myapp/bin:$PATH
-WORKDIR ./app/
 
+COPY ./src/ /app
+WORKDIR /app
 
-EXPOSE 8080
+# support running as arbitrary user which belogs to the root group
+RUN chmod -R 777 /var/cache/nginx /var/run /var/log/
+RUN chmod -R 777 /etc/supervisord.conf
+RUN chmod -R 777 /app
+RUN sed -i.bak 's/^user/#user/' /etc/nginx/nginx.conf
 
-CMD ["supervisord", "-n", "-c", "supervisor.conf"]
+EXPOSE 8081
+
+USER 1001
+
+CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisord.conf"]

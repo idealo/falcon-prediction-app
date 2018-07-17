@@ -9,14 +9,14 @@ Gunicorn as WSGI HTTP Server and nginx as HTTP proxy server.
 
 ```
 docker build -t falcon-prediction-app .
-docker run -p 8080:8080 falcon-prediction-app
+docker run -p 127.0.0.1:8000:8081 falcon-prediction-app
 ```
 
 ### Test prediction service
 
 ```
 (echo -n '{"image": "'; base64 src/tests/data/four_test.png; echo '"}') |
-curl -i -H "Content-Type: application/json" -d @-  http://0.0.0.0:8080/predict
+curl -i -H "Content-Type: application/json" -d @- http://127.0.0.1:8000/predict
 ```
 
 ### Run unittests
@@ -28,7 +28,7 @@ pytest -s src/tests/
 ### Run load testing
 
 ```
-locust -f load_testing.py --host=http://0.0.0.0:8080
+locust -f load_testing.py --host=http://127.0.0.1:8000
 ```
 Note: Access the Locust GUI via `http://localhost:8089/` to start load testing.
 

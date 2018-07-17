@@ -14,7 +14,7 @@ def convert_image(image):
     return rescaled_data
 
 
-class GetResource(object):
+class PredictResource(object):
 
     def __init__(self, model):
         self.model = model
@@ -26,7 +26,7 @@ class GetResource(object):
     def on_post(self, req, resp):
         """
         (echo -n '{"image": "'; four_test.png; echo '"}') |
-        curl -H "Content-Type: application/json" -d @-  http://0.0.0.0:8080/predict
+        curl -H "Content-Type: application/json" -d @-  http://127.0.0.1:8000/predict
         """
         image = json.loads(req.stream.read())
         decoded_image = base64.b64decode(image.get('image'))
