@@ -3,6 +3,8 @@
 Simple example that uses [Falcon](https://falconframework.org/) to create a deep learning RESTful prediction service (simple convnet trained on the MNIST dataset). [Locust](https://locust.io/) is used for load testing.
 [Gunicorn](http://gunicorn.org/) as WSGI HTTP Server and [nginx](https://www.nginx.com/) as HTTP proxy server.
 
+This repository is no longer maintained and has been archived on January, 7th, 2025. 
+
 ## Getting Started
 
 ### Run prediction service
